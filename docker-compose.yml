@@ -1,0 +1,37 @@
+version: "3.0"
+services:
+  store-db-postgres:
+    image: postgres:latest
+    hostname: postgres
+    container_name: store-db-postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=selectel
+      - POSTGRES_DB=store
+    ports:
+      - 5432:5432
+    networks: 
+      - store
+
+  store-app:
+    build: .
+    depends_on:
+      - store-db-postgres
+    links:
+      - store-db-postgres
+    restart: on-failure
+    ports:
+      - 3001:3001
+    environment:
+      - PGPASSWORD=postgres
+      - PGUSER=selectel
+      - PGDATABASE=store
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PORT=3001
+    networks: 
+      - store
+
+networks: 
+  store:
+    driver: bridge
